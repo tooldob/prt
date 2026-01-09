@@ -1,0 +1,1973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Renaming Tool - Full Screen</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2980, #26d0ce);
+            min-height: 100vh;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 550px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            max-height: 95vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: linear-gradient(to right, #1a2980, #26d0ce);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            position: relative;
+            flex-shrink: 0;
+        }
+        
+        .header h1 {
+            font-size: 1.4rem;
+            margin-bottom: 3px;
+        }
+        
+        .header p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #f0f4ff;
+            border-bottom: 1px solid #c2d1ff;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 10px 5px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: #1a2980;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            min-width: 80px;
+        }
+        
+        .tab.active {
+            background: white;
+            color: #1a2980;
+            border-bottom: 3px solid #26d0ce;
+        }
+        
+        .tab.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .content {
+            padding: 15px;
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .section {
+            margin-bottom: 15px;
+        }
+        
+        h2 {
+            font-size: 1rem;
+            margin-bottom: 8px;
+            color: #1a2980;
+            display: flex;
+            align-items: center;
+        }
+        
+        h2 i {
+            margin-right: 6px;
+            color: #26d0ce;
+            font-size: 0.9rem;
+        }
+        
+        .form-group {
+            margin-bottom: 10px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.85rem;
+            color: #1a2980;
+            font-weight: 500;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #c2d1ff;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background-color: #f9fbff;
+        }
+        
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .range-inputs {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .range-inputs input {
+            flex: 1;
+        }
+        
+        .prefix-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .prefix-input-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .prefix-input-row input {
+            flex: 1;
+        }
+        
+        .add-prefix-btn {
+            background: #26d0ce;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 5px;
+        }
+        
+        .add-prefix-btn.disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .remove-prefix-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .file-area {
+            border: 2px dashed #c2d1ff;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            background-color: #f9fbff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .file-area:hover {
+            border-color: #26d0ce;
+            background-color: #f0f4ff;
+        }
+        
+        .file-area.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .file-area.disabled:hover {
+            border-color: #c2d1ff;
+            background-color: #f9fbff;
+        }
+        
+        .file-area i {
+            font-size: 2rem;
+            color: #26d0ce;
+            margin-bottom: 8px;
+        }
+        
+        .file-area p {
+            margin-bottom: 10px;
+            color: #555;
+            font-size: 0.9rem;
+        }
+        
+        .file-area .btn {
+            background: linear-gradient(to right, #26d0ce, #1a2980);
+            color: white;
+            padding: 6px 15px;
+            border-radius: 18px;
+            display: inline-block;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        
+        .file-area .btn.disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .name-list {
+            background-color: #f9fbff;
+            border-radius: 10px;
+            padding: 10px;
+            max-height: 120px;
+            overflow-y: auto;
+            border: 1px solid #e0e8ff;
+            margin-top: 10px;
+            font-size: 0.85rem;
+        }
+        
+        .name-item {
+            padding: 6px 8px;
+            border-bottom: 1px solid #e0e8ff;
+            display: flex;
+            align-items: center;
+        }
+        
+        .name-item:last-child {
+            border-bottom: none;
+        }
+        
+        .name-item::before {
+            content: "•";
+            color: #26d0ce;
+            margin-right: 8px;
+            font-size: 1rem;
+        }
+        
+        .action-btns {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn.rename {
+            background: linear-gradient(to right, #26d0ce, #1a2980);
+            color: white;
+        }
+        
+        .btn.download {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+            color: white;
+        }
+        
+        .btn.reset {
+            background-color: #f0f4ff;
+            color: #1a2980;
+            border: 1px solid #c2d1ff;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        
+        .btn.disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .status-bar {
+            margin-top: 15px;
+            background-color: #e6f0ff;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #1a2980;
+            border: 1px solid #c2d1ff;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .file-count {
+            position: absolute;
+            top: 8px;
+            right: 15px;
+            background: #ff4757;
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        
+        .custom-note {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 3px;
+            font-style: italic;
+        }
+        
+        .progress-container {
+            margin-top: 10px;
+            background-color: #e0e8ff;
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, #26d0ce, #1a2980);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .photo-cycle-note {
+            font-size: 0.75rem;
+            color: #ff4757;
+            margin-top: 3px;
+            font-weight: 500;
+            background: #fff0f0;
+            padding: 3px 6px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        
+        .auto-adjust-note {
+            font-size: 0.75rem;
+            color: #26d0ce;
+            margin-top: 3px;
+            font-weight: 500;
+            background: #f0f4ff;
+            padding: 3px 6px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        
+        /* License specific styles */
+        .license-status-active {
+            color: #00b09b !important;
+            font-weight: bold;
+        }
+        
+        .license-status-expired {
+            color: #ff4757 !important;
+            font-weight: bold;
+        }
+        
+        .license-status-invalid {
+            color: #ff4757 !important;
+            font-weight: bold;
+        }
+        
+        .license-warning {
+            background: #fff0f0 !important;
+            border: 1px solid #ff4757 !important;
+            color: #ff4757 !important;
+            padding: 10px !important;
+            border-radius: 8px !important;
+            margin-bottom: 15px !important;
+            font-size: 0.85rem !important;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .license-badge {
+            position: absolute;
+            top: 8px;
+            left: 15px;
+            background: #00b09b;
+            color: white;
+            border-radius: 15px;
+            padding: 3px 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        
+        /* Copy button styles */
+        .copy-btn {
+            background: #26d0ce;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        
+        .copy-btn:hover {
+            background: #1a2980;
+        }
+        
+        /* Device ID display */
+        .device-id-display {
+            background: #f0f4ff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            word-break: break-all;
+            margin-top: 5px;
+            border: 1px solid #c2d1ff;
+        }
+        
+        /* Demo notice */
+        .demo-notice {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c2d1ff;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #26d0ce;
+        }
+        
+        @media (max-width: 500px) {
+            .action-btns {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .tabs {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            
+            .tab {
+                min-width: 20%;
+                padding: 8px 3px;
+                font-size: 0.75rem;
+            }
+            
+            .container {
+                max-height: 98vh;
+            }
+            
+            .prefix-input-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .remove-prefix-btn {
+                align-self: flex-end;
+                width: 100%;
+                height: 25px;
+            }
+            
+            .license-badge {
+                position: relative;
+                top: 0;
+                left: 0;
+                display: inline-block;
+                margin-top: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="mainContainer">
+        <div class="header">
+            <h1><i class="fas fa-camera-retro"></i> Photo Renaming Tool</h1>
+            <p>One-click download for all JPGs</p>
+            <div class="file-count" id="fileCount">0</div>
+            <div class="license-badge" id="licenseBadge" style="display: none;">LICENSED</div>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="range">Range</div>
+            <div class="tab" data-tab="pattern">Pattern</div>
+            <div class="tab" data-tab="multiple">Multiple</div>
+            <div class="tab" data-tab="custom">Custom</div>
+            <div class="tab" data-tab="numbers">Numbers</div>
+            <div class="tab" data-tab="license">License</div>
+        </div>
+        
+        <div class="content">
+            <!-- Demo notice (shown only when license is inactive) -->
+            <div class="demo-notice" id="demoNotice">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>DEMO MODE:</strong> You can test the tool with up to 5 photos. 
+                    For full features, please activate your license.
+                </div>
+            </div>
+            
+            <!-- Range Selection Tab -->
+            <div class="tab-content active" id="rangeTab">
+                <div class="section">
+                    <h2><i class="fas fa-sliders-h"></i> Range Options</h2>
+                    <div class="form-group">
+                        <label for="prefix">Prefix (e.g., S1, S18)</label>
+                        <input type="text" id="prefix" placeholder="Enter prefix" value="S1">
+                    </div>
+                    <div class="form-group">
+                        <label for="startRange">Number Range</label>
+                        <div class="range-inputs">
+                            <input type="number" id="startRange" placeholder="Start" value="1" min="1">
+                            <input type="number" id="endRange" placeholder="End" value="10" min="1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pattern Selection Tab -->
+            <div class="tab-content" id="patternTab">
+                <div class="section">
+                    <h2><i class="fas fa-shapes"></i> Pattern Options</h2>
+                    <div class="form-group">
+                        <label for="patternPrefix">Prefix (e.g., S5)</label>
+                        <input type="text" id="patternPrefix" placeholder="Enter prefix" value="S5">
+                    </div>
+                    <div class="form-group">
+                        <label for="letters">Letters (e.g., a, b, c)</label>
+                        <input type="text" id="letters" placeholder="Comma separated letters" value="a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z">
+                    </div>
+                    <div class="form-group">
+                        <label for="pairSize">Group Size (photos per letter)</label>
+                        <input type="number" id="pairSize" placeholder="Group size" value="2" min="1">
+                        <div class="custom-note">Har letter ke liye kitne photos? Example: 2 = S5_a_1, S5_a_2</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="patternStart">Number Range</label>
+                        <div class="range-inputs">
+                            <input type="number" id="patternStart" placeholder="Start" value="1" min="1">
+                            <input type="number" id="patternEnd" placeholder="End" value="2" min="1">
+                        </div>
+                        <div class="custom-note">
+                            Number range determines numbering within each group
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Multiple Prefix Tab -->
+            <div class="tab-content" id="multipleTab">
+                <div class="section">
+                    <h2><i class="fas fa-layer-group"></i> Multiple Prefixes with Letters</h2>
+                    <div class="auto-adjust-note">
+                        <i class="fas fa-magic"></i> Group size automatically adjusts based on uploaded photos count
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Prefixes (e.g., S5, S15, S16)</label>
+                        <div class="prefix-inputs" id="prefixInputs">
+                            <div class="prefix-input-row">
+                                <input type="text" class="multiple-prefix" placeholder="Enter prefix (e.g., S5)" value="S5">
+                                <button class="remove-prefix-btn" style="display: none;"><i class="fas fa-times"></i></button>
+                            </div>
+                            <div class="prefix-input-row">
+                                <input type="text" class="multiple-prefix" placeholder="Enter prefix (e.g., S15)" value="S15">
+                                <button class="remove-prefix-btn"><i class="fas fa-times"></i></button>
+                            </div>
+                        </div>
+                        <button class="add-prefix-btn" id="addPrefixBtn">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <label for="multipleLetters">Letters (e.g., a, b, c to z)</label>
+                        <input type="text" id="multipleLetters" placeholder="Comma separated letters" value="a,b,c">
+                    </div>
+                    <div class="form-group">
+                        <label for="multipleGroupSize">Photos per Letter <span id="autoSizeLabel">(Auto: 1)</span></label>
+                        <input type="number" id="multipleGroupSize" placeholder="Group size" value="1" min="1" readonly style="background-color: #e6f0ff;">
+                        <div class="custom-note">
+                            Auto-adjusted based on uploaded photos. Example: 4 photos = 4 per letter
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="multipleStart">Number Range (Start - End)</label>
+                        <div class="range-inputs">
+                            <input type="number" id="multipleStart" placeholder="Start" value="1" min="1">
+                            <input type="number" id="multipleEnd" placeholder="End" value="1" min="1">
+                        </div>
+                        <div class="custom-note">
+                            Har letter ke andar numbering. Example: 1-4 = _1, _2, _3, _4
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Custom Names Tab -->
+            <div class="tab-content" id="customTab">
+                <div class="section">
+                    <h2><i class="fas fa-edit"></i> Custom Names</h2>
+                    <div class="form-group">
+                        <label for="customNames">Enter names (one per line)</label>
+                        <textarea id="customNames" placeholder="Example:
+S1_1
+S11_1
+S16_2
+S5_a_3"></textarea>
+                        <div class="custom-note">Each name creates a copy of the first uploaded photo</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Numbers Tab -->
+            <div class="tab-content" id="numbersTab">
+                <div class="section">
+                    <h2><i class="fas fa-sort-numeric-down"></i> Number Sequence</h2>
+                    <div class="form-group">
+                        <label for="startNumber">Start Number</label>
+                        <input type="number" id="startNumber" placeholder="Start from" value="1" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="stepValue">Increment By</label>
+                        <input type="number" id="stepValue" placeholder="Step value" value="1" min="1">
+                    </div>
+                    <div class="custom-note">
+                        Files will be renamed as: 1, 2, 3, ... (without any prefixes)
+                    </div>
+                </div>
+            </div>
+            
+            <!-- License Tab -->
+            <div class="tab-content" id="licenseTab">
+                <div class="section">
+                    <h2><i class="fas fa-key"></i> License Activation</h2>
+                    
+                    <div class="form-group">
+                        <label>Your Device ID</label>
+                        <div class="device-id-display" id="deviceIdDisplay">
+                            Generating Device ID...
+                        </div>
+                        <div class="custom-note">
+                            <button class="copy-btn" id="copyDeviceIdBtn">
+                                <i class="fas fa-copy"></i> Copy Device ID
+                            </button>
+                            Send this Device ID to get a license key
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="licenseKeyInput">License Key (from License Generator)</label>
+                        <input type="text" id="licenseKeyInput" placeholder="Paste license key here" autocomplete="off">
+                        <div class="custom-note">
+                            Paste the license key received from the tool provider
+                        </div>
+                    </div>
+                    
+                    <button class="btn rename" id="activateLicenseBtn">
+                        <i class="fas fa-check"></i> Activate License
+                    </button>
+                    
+                    <div class="form-group" style="margin-top: 20px; padding: 15px; background: #f0f4ff; border-radius: 10px;">
+                        <h3 style="color: #1a2980; margin-bottom: 10px;">License Status</h3>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="font-weight: 600;">Status:</span>
+                            <span id="licenseStatus" style="color: #ff4757;">INACTIVE</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="font-weight: 600;">Expiry:</span>
+                            <span id="licenseExpiry">--</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="font-weight: 600;">Remaining:</span>
+                            <span id="licenseCountdown">--</span>
+                        </div>
+                        <div style="margin-top: 15px; padding: 10px; background: white; border-radius: 5px; text-align: center;">
+                            <button class="btn reset" id="clearLicenseBtn" style="width: 100%;">
+                                <i class="fas fa-trash-alt"></i> Clear License
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2><i class="fas fa-images"></i> Upload Photos</h2>
+                <div class="file-area" id="dropZone">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Drag & Drop photos here or</p>
+                    <div class="btn">Choose Files</div>
+                    <input type="file" id="fileInput" multiple accept="image/*" class="hidden">
+                </div>
+                <div class="custom-note" id="fileLimitNote">
+                    <i class="fas fa-info-circle"></i> Demo limit: Maximum 5 photos allowed
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2><i class="fas fa-list"></i> New File Names</h2>
+                <div class="name-list" id="nameList">
+                    <div class="name-item">No files selected</div>
+                </div>
+            </div>
+            
+            <div class="progress-container hidden" id="progressContainer">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            
+            <div class="action-btns">
+                <button class="btn rename" id="renameBtn">
+                    <i class="fas fa-sync-alt"></i> Rename
+                </button>
+                <button class="btn download" id="downloadBtn" disabled>
+                    <i class="fas fa-download"></i> Download All
+                </button>
+                <button class="btn reset" id="resetBtn">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+            </div>
+            
+            <div class="status-bar" id="statusBar">
+                Ready to rename photos. Select files and options.
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // =============== LICENSE SYSTEM ===============
+        const LICENSE_SECRET = "PHOTO_RENAME_SECRET_2024_V2";
+        let licenseCheckInterval = null;
+        let currentDeviceId = '';
+        let isLicenseValid = false;
+        let licenseExpiryTime = null;
+
+        // Generate Device ID (Fingerprint)
+        function generateDeviceId() {
+            try {
+                const components = [
+                    navigator.userAgent,
+                    navigator.platform,
+                    screen.width + 'x' + screen.height + 'x' + screen.colorDepth,
+                    new Date().getTimezoneOffset(),
+                    navigator.language,
+                    navigator.hardwareConcurrency || 'unknown',
+                    navigator.deviceMemory || 'unknown',
+                    navigator.maxTouchPoints || 'unknown'
+                ].join('|');
+                
+                // Simple hash function
+                let hash = 0;
+                for (let i = 0; i < components.length; i++) {
+                    const char = components.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash;
+                }
+                
+                // Add some randomness and obfuscation
+                const timestamp = Date.now().toString(36);
+                const random = Math.random().toString(36).substring(2, 10);
+                
+                return btoa(hash + '|' + timestamp + '|' + random + '|' + components.length)
+                    .replace(/=/g, '')
+                    .replace(/\+/g, '-')
+                    .replace(/\//g, '_')
+                    .substring(0, 24);
+            } catch (error) {
+                return 'ERR_' + Math.random().toString(36).substring(2, 12);
+            }
+        }
+
+        // Encode license data
+        function encodeLicenseData(deviceId, expiryTimestamp) {
+            const data = {
+                d: deviceId,
+                e: expiryTimestamp,
+                v: 2,
+                t: Date.now(),
+                c: LICENSE_SECRET.length
+            };
+            
+            const jsonString = JSON.stringify(data);
+            const encoded = btoa(jsonString);
+            
+            // XOR obfuscation with rotating key
+            let obfuscated = '';
+            for (let i = 0; i < encoded.length; i++) {
+                const keyChar = LICENSE_SECRET.charCodeAt(i % LICENSE_SECRET.length);
+                const encodedChar = encoded.charCodeAt(i);
+                obfuscated += String.fromCharCode(encodedChar ^ keyChar);
+            }
+            
+            return btoa(obfuscated);
+        }
+
+        // Decode license key
+        function decodeLicenseKey(licenseKey) {
+            try {
+                // First decode from Base64
+                const obfuscated = atob(licenseKey);
+                
+                // Reverse XOR obfuscation
+                let decoded = '';
+                for (let i = 0; i < obfuscated.length; i++) {
+                    const keyChar = LICENSE_SECRET.charCodeAt(i % LICENSE_SECRET.length);
+                    const obfuscatedChar = obfuscated.charCodeAt(i);
+                    decoded += String.fromCharCode(obfuscatedChar ^ keyChar);
+                }
+                
+                // Decode the inner Base64
+                const jsonString = atob(decoded);
+                const licenseData = JSON.parse(jsonString);
+                
+                // Verify version
+                if (licenseData.v !== 2) {
+                    return null;
+                }
+                
+                return licenseData;
+            } catch (error) {
+                return null;
+            }
+        }
+
+        // Validate license
+        function validateLicense(licenseData, currentDeviceId) {
+            // Check if license data is valid
+            if (!licenseData || !licenseData.d || !licenseData.e) {
+                return { valid: false, reason: "Invalid license format" };
+            }
+            
+            // Check device ID match
+            if (licenseData.d !== currentDeviceId) {
+                return { valid: false, reason: "License not valid for this device" };
+            }
+            
+            // Check expiry
+            const currentTime = Date.now();
+            if (currentTime > licenseData.e) {
+                return { valid: false, reason: "License expired" };
+            }
+            
+            return { 
+                valid: true, 
+                expiry: licenseData.e,
+                remaining: licenseData.e - currentTime
+            };
+        }
+
+        // Format remaining time
+        function formatRemainingTime(ms) {
+            if (ms <= 0) return "EXPIRED";
+            
+            const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((ms % (1000 * 60)) / 1000);
+            
+            if (days > 0) {
+                return `${days}d ${hours}h ${minutes}m`;
+            } else if (hours > 0) {
+                return `${hours}h ${minutes}m ${seconds}s`;
+            } else if (minutes > 0) {
+                return `${minutes}m ${seconds}s`;
+            } else {
+                return `${seconds}s`;
+            }
+        }
+
+        // Update license UI
+        function updateLicenseUI(valid, expiryTime = null) {
+            const statusElem = document.getElementById('licenseStatus');
+            const expiryElem = document.getElementById('licenseExpiry');
+            const countdownElem = document.getElementById('licenseCountdown');
+            const licenseBadge = document.getElementById('licenseBadge');
+            const demoNotice = document.getElementById('demoNotice');
+            
+            // Clear existing interval
+            if (licenseCheckInterval) {
+                clearInterval(licenseCheckInterval);
+            }
+            
+            if (valid && expiryTime) {
+                isLicenseValid = true;
+                licenseExpiryTime = expiryTime;
+                
+                statusElem.textContent = "ACTIVE";
+                statusElem.className = "license-status-active";
+                licenseBadge.style.display = 'flex';
+                
+                if (demoNotice) demoNotice.style.display = 'none';
+                
+                if (expiryTime) {
+                    const expiryDate = new Date(expiryTime);
+                    expiryElem.textContent = expiryDate.toLocaleDateString() + ' ' + expiryDate.toLocaleTimeString();
+                    
+                    // Start countdown update
+                    function updateCountdown() {
+                        const remaining = expiryTime - Date.now();
+                        if (remaining <= 0) {
+                            countdownElem.textContent = "EXPIRED";
+                            statusElem.textContent = "EXPIRED";
+                            statusElem.className = "license-status-expired";
+                            licenseBadge.style.display = 'none';
+                            isLicenseValid = false;
+                            
+                            if (demoNotice) demoNotice.style.display = 'flex';
+                            updateToolAccess();
+                            return;
+                        }
+                        
+                        countdownElem.textContent = formatRemainingTime(remaining);
+                    }
+                    
+                    updateCountdown();
+                    licenseCheckInterval = setInterval(updateCountdown, 1000);
+                }
+            } else {
+                isLicenseValid = false;
+                licenseExpiryTime = null;
+                
+                statusElem.textContent = "INACTIVE";
+                statusElem.className = "license-status-invalid";
+                expiryElem.textContent = "--";
+                countdownElem.textContent = "--";
+                licenseBadge.style.display = 'none';
+                
+                if (demoNotice) demoNotice.style.display = 'flex';
+            }
+            
+            updateToolAccess();
+        }
+
+        // Update tool access based on license status
+        function updateToolAccess() {
+            const tabs = document.querySelectorAll('.tab:not([data-tab="license"])');
+            const fileArea = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+            const renameBtn = document.getElementById('renameBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const addPrefixBtn = document.getElementById('addPrefixBtn');
+            const fileLimitNote = document.getElementById('fileLimitNote');
+            
+            if (isLicenseValid) {
+                // Licensed mode - full access
+                tabs.forEach(tab => {
+                    tab.classList.remove('disabled');
+                });
+                
+                if (fileArea) fileArea.classList.remove('disabled');
+                if (fileInput) fileInput.disabled = false;
+                if (addPrefixBtn) addPrefixBtn.classList.remove('disabled');
+                if (fileLimitNote) fileLimitNote.style.display = 'none';
+            } else {
+                // Demo mode - limited access
+                tabs.forEach(tab => {
+                    if (tab.dataset.tab !== 'license') {
+                        tab.classList.add('disabled');
+                    }
+                });
+                
+                if (fileArea) fileArea.classList.add('disabled');
+                if (fileInput) fileInput.disabled = true;
+                if (addPrefixBtn) addPrefixBtn.classList.add('disabled');
+                if (fileLimitNote) fileLimitNote.style.display = 'block';
+                
+                // Enable only Range tab for demo
+                const rangeTab = document.querySelector('.tab[data-tab="range"]');
+                if (rangeTab) {
+                    rangeTab.classList.remove('disabled');
+                }
+            }
+        }
+
+        // Copy Device ID to clipboard
+        function copyDeviceIdToClipboard() {
+            const deviceIdText = currentDeviceId;
+            
+            // Use modern clipboard API if available
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(deviceIdText).then(() => {
+                    showStatusMessage('Device ID copied to clipboard!', 'success');
+                }).catch(err => {
+                    fallbackCopyMethod(deviceIdText);
+                });
+            } else {
+                fallbackCopyMethod(deviceIdText);
+            }
+        }
+
+        function fallbackCopyMethod(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.opacity = '0';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showStatusMessage('Device ID copied to clipboard!', 'success');
+                } else {
+                    showStatusMessage('Failed to copy Device ID', 'error');
+                }
+            } catch (err) {
+                showStatusMessage('Failed to copy Device ID', 'error');
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        function showStatusMessage(message, type) {
+            const statusBar = document.getElementById('statusBar');
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+            const color = type === 'success' ? '#00b09b' : '#ff4757';
+            
+            statusBar.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
+            statusBar.style.backgroundColor = type === 'success' ? '#e6fff0' : '#fff0f0';
+            statusBar.style.color = color;
+            
+            setTimeout(() => {
+                statusBar.style.backgroundColor = '#e6f0ff';
+                statusBar.style.color = '#1a2980';
+                statusBar.textContent = 'Ready to rename photos. Select files and options.';
+            }, 3000);
+        }
+
+        // Initialize Device ID
+        function initializeDeviceId() {
+            let deviceId = localStorage.getItem('device_id');
+            if (!deviceId) {
+                deviceId = generateDeviceId();
+                localStorage.setItem('device_id', deviceId);
+            }
+            
+            currentDeviceId = deviceId;
+            
+            // Display Device ID
+            const deviceIdDisplay = document.getElementById('deviceIdDisplay');
+            if (deviceIdDisplay) {
+                deviceIdDisplay.textContent = deviceId;
+            }
+            
+            // Setup copy button
+            const copyBtn = document.getElementById('copyDeviceIdBtn');
+            if (copyBtn) {
+                copyBtn.addEventListener('click', copyDeviceIdToClipboard);
+            }
+        }
+
+        // Check license on load
+        function checkLicenseOnLoad() {
+            // Initialize Device ID first
+            initializeDeviceId();
+            
+            // Check saved license
+            const savedLicense = localStorage.getItem('photo_rename_license');
+            if (savedLicense) {
+                const licenseData = decodeLicenseKey(savedLicense);
+                if (licenseData) {
+                    const validation = validateLicense(licenseData, currentDeviceId);
+                    updateLicenseUI(validation.valid, validation.expiry);
+                    
+                    if (!validation.valid) {
+                        showStatusMessage(validation.reason, 'error');
+                    }
+                } else {
+                    updateLicenseUI(false);
+                }
+            } else {
+                updateLicenseUI(false);
+            }
+        }
+
+        // =============== MAIN APPLICATION ===============
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check license first
+            checkLicenseOnLoad();
+            
+            // DOM Elements
+            const fileInput = document.getElementById('fileInput');
+            const dropZone = document.getElementById('dropZone');
+            const renameBtn = document.getElementById('renameBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const nameList = document.getElementById('nameList');
+            const statusBar = document.getElementById('statusBar');
+            const tabs = document.querySelectorAll('.tab');
+            const rangeTab = document.getElementById('rangeTab');
+            const patternTab = document.getElementById('patternTab');
+            const multipleTab = document.getElementById('multipleTab');
+            const customTab = document.getElementById('customTab');
+            const numbersTab = document.getElementById('numbersTab');
+            const licenseTab = document.getElementById('licenseTab');
+            const fileCount = document.getElementById('fileCount');
+            const customNamesInput = document.getElementById('customNames');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            const prefixInputs = document.getElementById('prefixInputs');
+            const addPrefixBtn = document.getElementById('addPrefixBtn');
+            
+            // License elements
+            const licenseKeyInput = document.getElementById('licenseKeyInput');
+            const activateLicenseBtn = document.getElementById('activateLicenseBtn');
+            const clearLicenseBtn = document.getElementById('clearLicenseBtn');
+            
+            // Form elements
+            const prefixInput = document.getElementById('prefix');
+            const startRangeInput = document.getElementById('startRange');
+            const endRangeInput = document.getElementById('endRange');
+            const patternPrefixInput = document.getElementById('patternPrefix');
+            const lettersInput = document.getElementById('letters');
+            const patternStartInput = document.getElementById('patternStart');
+            const patternEndInput = document.getElementById('patternEnd');
+            const startNumberInput = document.getElementById('startNumber');
+            const stepValueInput = document.getElementById('stepValue');
+            const pairSizeInput = document.getElementById('pairSize');
+            
+            // Multiple tab elements
+            const multipleStartInput = document.getElementById('multipleStart');
+            const multipleEndInput = document.getElementById('multipleEnd');
+            const multipleLettersInput = document.getElementById('multipleLetters');
+            const multipleGroupSizeInput = document.getElementById('multipleGroupSize');
+            const autoSizeLabel = document.getElementById('autoSizeLabel');
+            
+            // Current state
+            let selectedFiles = [];
+            let renamedFiles = [];
+            let currentTab = 'range';
+            
+            // Initialize
+            updateFileCount();
+            initializeMultiplePrefixes();
+            updateToolAccess(); // Initial tool access update
+            
+            // =============== EVENT LISTENERS ===============
+            
+            // License activation
+            activateLicenseBtn.addEventListener('click', function() {
+                const licenseKey = licenseKeyInput.value.trim();
+                
+                if (!licenseKey) {
+                    showStatusMessage("Please enter a license key", "error");
+                    return;
+                }
+                
+                const licenseData = decodeLicenseKey(licenseKey);
+                if (!licenseData) {
+                    showStatusMessage("Invalid license key format", "error");
+                    return;
+                }
+                
+                const validation = validateLicense(licenseData, currentDeviceId);
+                if (validation.valid) {
+                    // Save license
+                    localStorage.setItem('photo_rename_license', licenseKey);
+                    
+                    // Update UI
+                    updateLicenseUI(true, validation.expiry);
+                    
+                    // Show success
+                    showStatusMessage(`License activated! Valid until: ${new Date(validation.expiry).toLocaleDateString()}`, 'success');
+                    
+                    // Switch to first tab
+                    switchTab(document.querySelector('.tab[data-tab="range"]'));
+                    
+                    // Clear input
+                    licenseKeyInput.value = '';
+                } else {
+                    showStatusMessage(validation.reason, "error");
+                    updateLicenseUI(false);
+                }
+            });
+            
+            // Clear license
+            clearLicenseBtn.addEventListener('click', function() {
+                localStorage.removeItem('photo_rename_license');
+                updateLicenseUI(false);
+                licenseKeyInput.value = '';
+                showStatusMessage('License cleared. Demo mode activated.', 'info');
+            });
+            
+            // Tab switching with license check
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Allow license tab always
+                    if (tab.dataset.tab === 'license') {
+                        switchTab(tab);
+                        return;
+                    }
+                    
+                    // Check if tab is disabled
+                    if (tab.classList.contains('disabled')) {
+                        if (!isLicenseValid) {
+                            showStatusMessage("Please activate license to access this feature", "error");
+                            switchTab(document.querySelector('.tab[data-tab="license"]'));
+                        }
+                        return;
+                    }
+                    
+                    // License valid, allow tab switch
+                    switchTab(tab);
+                });
+            });
+            
+            function switchTab(tab) {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentTab = tab.dataset.tab;
+                
+                rangeTab.classList.remove('active');
+                patternTab.classList.remove('active');
+                multipleTab.classList.remove('active');
+                customTab.classList.remove('active');
+                numbersTab.classList.remove('active');
+                licenseTab.classList.remove('active');
+                
+                if (currentTab === 'range') {
+                    rangeTab.classList.add('active');
+                } else if (currentTab === 'pattern') {
+                    patternTab.classList.add('active');
+                } else if (currentTab === 'multiple') {
+                    multipleTab.classList.add('active');
+                } else if (currentTab === 'custom') {
+                    customTab.classList.add('active');
+                } else if (currentTab === 'numbers') {
+                    numbersTab.classList.add('active');
+                } else {
+                    licenseTab.classList.add('active');
+                }
+                
+                generateNames();
+            }
+            
+            // Input change listeners
+            prefixInput.addEventListener('input', generateNames);
+            startRangeInput.addEventListener('input', generateNames);
+            endRangeInput.addEventListener('input', generateNames);
+            patternPrefixInput.addEventListener('input', generateNames);
+            lettersInput.addEventListener('input', generateNames);
+            patternStartInput.addEventListener('input', generateNames);
+            patternEndInput.addEventListener('input', generateNames);
+            customNamesInput.addEventListener('input', generateNames);
+            startNumberInput.addEventListener('input', generateNames);
+            stepValueInput.addEventListener('input', generateNames);
+            pairSizeInput.addEventListener('input', generateNames);
+            multipleStartInput.addEventListener('input', generateNames);
+            multipleEndInput.addEventListener('input', generateNames);
+            multipleLettersInput.addEventListener('input', generateNames);
+            
+            // Multiple prefix listeners
+            addPrefixBtn.addEventListener('click', function() {
+                if (this.classList.contains('disabled')) return;
+                addPrefixField();
+            });
+            
+            // File operations with license check
+            dropZone.addEventListener('click', () => {
+                if (dropZone.classList.contains('disabled')) {
+                    if (!isLicenseValid) {
+                        showStatusMessage("Please activate license to upload files", "error");
+                        switchTab(document.querySelector('.tab[data-tab="license"]'));
+                    }
+                    return;
+                }
+                fileInput.click();
+            });
+            
+            fileInput.addEventListener('change', (e) => {
+                if (fileInput.disabled) return;
+                
+                let files = Array.from(e.target.files);
+                
+                // Apply file limit in demo mode
+                if (!isLicenseValid && files.length > 5) {
+                    showStatusMessage("Demo limit: Maximum 5 photos allowed. Please activate license for unlimited photos.", "error");
+                    files = files.slice(0, 5); // Take only first 5 files
+                }
+                
+                selectedFiles = files;
+                updateFileCount();
+                updateAutoGroupSize();
+                generateNames();
+                updateStatus();
+            });
+            
+            dropZone.addEventListener('dragover', (e) => {
+                if (dropZone.classList.contains('disabled')) return;
+                e.preventDefault();
+                dropZone.style.borderColor = '#26d0ce';
+                dropZone.style.backgroundColor = '#e1e9ff';
+            });
+            
+            dropZone.addEventListener('dragleave', () => {
+                if (dropZone.classList.contains('disabled')) return;
+                dropZone.style.borderColor = '#c2d1ff';
+                dropZone.style.backgroundColor = '#f9fbff';
+            });
+            
+            dropZone.addEventListener('drop', (e) => {
+                if (dropZone.classList.contains('disabled')) return;
+                
+                e.preventDefault();
+                dropZone.style.borderColor = '#c2d1ff';
+                dropZone.style.backgroundColor = '#f9fbff';
+                
+                if (e.dataTransfer.files.length > 0) {
+                    let files = Array.from(e.dataTransfer.files);
+                    
+                    // Apply file limit in demo mode
+                    if (!isLicenseValid && files.length > 5) {
+                        showStatusMessage("Demo limit: Maximum 5 photos allowed. Please activate license for unlimited photos.", "error");
+                        files = files.slice(0, 5); // Take only first 5 files
+                    }
+                    
+                    selectedFiles = files;
+                    updateFileCount();
+                    updateAutoGroupSize();
+                    generateNames();
+                    updateStatus();
+                }
+            });
+            
+            renameBtn.addEventListener('click', function() {
+                if (this.classList.contains('disabled')) return;
+                renameFiles();
+            });
+            
+            downloadBtn.addEventListener('click', function() {
+                if (this.classList.contains('disabled')) return;
+                downloadFiles();
+            });
+            
+            resetBtn.addEventListener('click', resetTool);
+            
+            // =============== FUNCTIONS ===============
+            
+            function initializeMultiplePrefixes() {
+                const prefixFields = prefixInputs.querySelectorAll('.multiple-prefix');
+                prefixFields.forEach((input, index) => {
+                    input.addEventListener('input', generateNames);
+                    
+                    const removeBtn = input.nextElementSibling;
+                    if (removeBtn && removeBtn.classList.contains('remove-prefix-btn')) {
+                        if (index === 0) {
+                            removeBtn.style.display = 'none';
+                        } else {
+                            removeBtn.style.display = 'flex';
+                        }
+                        removeBtn.addEventListener('click', function() {
+                            const row = this.parentElement;
+                            if (prefixInputs.children.length > 1) {
+                                prefixInputs.removeChild(row);
+                                generateNames();
+                            }
+                        });
+                    }
+                });
+            }
+            
+            function addPrefixField() {
+                const prefixRow = document.createElement('div');
+                prefixRow.className = 'prefix-input-row';
+                
+                const newInput = document.createElement('input');
+                newInput.type = 'text';
+                newInput.className = 'multiple-prefix';
+                newInput.placeholder = 'Enter prefix (e.g., S20)';
+                newInput.addEventListener('input', generateNames);
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-prefix-btn';
+                removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                removeBtn.addEventListener('click', function() {
+                    if (prefixInputs.children.length > 1) {
+                        prefixInputs.removeChild(prefixRow);
+                        generateNames();
+                    }
+                });
+                
+                prefixRow.appendChild(newInput);
+                prefixRow.appendChild(removeBtn);
+                prefixInputs.appendChild(prefixRow);
+                
+                generateNames();
+            }
+            
+            function updateAutoGroupSize() {
+                const groupSize = selectedFiles.length > 0 ? selectedFiles.length : 1;
+                multipleGroupSizeInput.value = groupSize;
+                autoSizeLabel.textContent = `(Auto: ${groupSize})`;
+                
+                // Auto-update end range
+                if (selectedFiles.length > 0) {
+                    multipleEndInput.value = groupSize;
+                }
+            }
+            
+            function getMultiplePrefixes() {
+                const prefixes = [];
+                const prefixFields = prefixInputs.querySelectorAll('.multiple-prefix');
+                prefixFields.forEach(input => {
+                    const value = input.value.trim();
+                    if (value !== '') {
+                        prefixes.push(value);
+                    }
+                });
+                return prefixes;
+            }
+            
+            function updateFileCount() {
+                fileCount.textContent = selectedFiles.length;
+                fileCount.style.display = selectedFiles.length > 0 ? 'flex' : 'none';
+            }
+            
+            function generateNames() {
+                nameList.innerHTML = '';
+                
+                if (selectedFiles.length === 0) {
+                    nameList.innerHTML = '<div class="name-item">No files selected</div>';
+                    downloadBtn.disabled = true;
+                    return;
+                }
+                
+                renamedFiles = [];
+                
+                if (currentTab === 'range') {
+                    generateRangeNames();
+                } else if (currentTab === 'pattern') {
+                    generatePatternNames();
+                } else if (currentTab === 'multiple') {
+                    generateMultipleWithAutoGroupSize();
+                } else if (currentTab === 'custom') {
+                    generateCustomNames();
+                } else if (currentTab === 'numbers') {
+                    generateNumberSequence();
+                }
+                
+                // Display names (show first 20 only if too many)
+                const maxDisplay = 20;
+                let displayCount = 0;
+                
+                renamedFiles.forEach((name, index) => {
+                    if (displayCount < maxDisplay) {
+                        const nameItem = document.createElement('div');
+                        nameItem.className = 'name-item';
+                        nameItem.textContent = name;
+                        
+                        // Add separator for better readability
+                        if (currentTab === 'multiple' && index > 0) {
+                            const prefixes = getMultiplePrefixes();
+                            const letters = multipleLettersInput.value.split(',').map(l => l.trim()).filter(l => l !== '');
+                            const groupSize = parseInt(multipleGroupSizeInput.value) || 1;
+                            const start = parseInt(multipleStartInput.value) || 1;
+                            const end = parseInt(multipleEndInput.value) || start;
+                            
+                            const itemsPerPrefix = letters.length * (end - start + 1);
+                            if (index % itemsPerPrefix === 0) {
+                                const separator = document.createElement('div');
+                                separator.style.padding = '2px 8px';
+                                separator.style.fontSize = '0.7rem';
+                                separator.style.color = '#666';
+                                separator.style.fontStyle = 'italic';
+                                separator.style.borderTop = '1px dashed #c2d1ff';
+                                separator.style.marginTop = '2px';
+                                separator.textContent = '--- Next Prefix ---';
+                                nameList.appendChild(separator);
+                            }
+                        }
+                        
+                        nameList.appendChild(nameItem);
+                        displayCount++;
+                    }
+                });
+                
+                // Add message if more files exist
+                if (renamedFiles.length > maxDisplay) {
+                    const moreItem = document.createElement('div');
+                    moreItem.className = 'name-item';
+                    moreItem.style.color = '#666';
+                    moreItem.style.fontStyle = 'italic';
+                    moreItem.textContent = `... and ${renamedFiles.length - maxDisplay} more files`;
+                    nameList.appendChild(moreItem);
+                }
+                
+                updateStatus();
+            }
+            
+            function generateRangeNames() {
+                const prefix = prefixInput.value.trim() || 'S';
+                const start = parseInt(startRangeInput.value) || 1;
+                let end = parseInt(endRangeInput.value) || start;
+                
+                if (end < start) end = start;
+                if (end - start + 1 < selectedFiles.length) {
+                    end = start + selectedFiles.length - 1;
+                    endRangeInput.value = end;
+                }
+                
+                for (let i = 0; i < selectedFiles.length; i++) {
+                    if (i + start > end) break;
+                    const newName = `${prefix}_${i + start}`;
+                    renamedFiles.push(newName);
+                }
+            }
+            
+            function generatePatternNames() {
+                const prefix = patternPrefixInput.value.trim() || 'S5';
+                const letters = lettersInput.value.split(',').map(l => l.trim()).filter(l => l !== '');
+                const start = parseInt(patternStartInput.value) || 1;
+                let end = parseInt(patternEndInput.value) || start;
+                const pairSize = parseInt(pairSizeInput.value) || 2;
+                
+                if (end < start) end = start;
+                
+                if (letters.length === 0) {
+                    // If no letters, just use numbers
+                    for (let i = 0; i < selectedFiles.length; i++) {
+                        if (i + start > end) break;
+                        const newName = `${prefix}_${i + start}`;
+                        renamedFiles.push(newName);
+                    }
+                    return;
+                }
+                
+                // FLEXIBLE GROUPING LOGIC
+                // Har group (pairSize) ke liye same letter, different numbers
+                for (let i = 0; i < selectedFiles.length; i++) {
+                    const letterIndex = Math.floor(i / pairSize) % letters.length;
+                    const num = start + (i % pairSize);
+                    const newName = `${prefix}_${letters[letterIndex]}_${num}`;
+                    renamedFiles.push(newName);
+                }
+                
+                // Auto-adjust end value based on pairSize
+                const suggestedEnd = start + pairSize - 1;
+                if (patternEndInput.value != suggestedEnd) {
+                    patternEndInput.value = suggestedEnd;
+                }
+            }
+            
+            function generateMultipleWithAutoGroupSize() {
+                const prefixes = getMultiplePrefixes();
+                const letters = multipleLettersInput.value.split(',').map(l => l.trim()).filter(l => l !== '');
+                const start = parseInt(multipleStartInput.value) || 1;
+                let end = parseInt(multipleEndInput.value) || start;
+                
+                // Auto-calculate group size based on uploaded photos
+                const groupSize = selectedFiles.length > 0 ? selectedFiles.length : 1;
+                
+                if (end < start) end = start;
+                
+                if (prefixes.length === 0) {
+                    // If no prefixes, use default
+                    prefixes.push('S');
+                }
+                
+                if (letters.length === 0) {
+                    // If no letters, just use numbers with prefixes
+                    let fileIndex = 0;
+                    for (let p = 0; p < prefixes.length; p++) {
+                        for (let i = 0; i < groupSize; i++) {
+                            if (fileIndex >= selectedFiles.length * 10) break; // Safety limit
+                            const num = start + (i % (end - start + 1));
+                            const newName = `${prefixes[p]}_${num}`;
+                            renamedFiles.push(newName);
+                            fileIndex++;
+                        }
+                    }
+                    return;
+                }
+                
+                // Calculate total names needed
+                const totalNamesNeeded = prefixes.length * letters.length * (end - start + 1);
+                
+                // Generate all names (photos will be cycled)
+                let photoIndex = 0;
+                
+                for (let p = 0; p < prefixes.length; p++) {
+                    const prefix = prefixes[p];
+                    
+                    for (let l = 0; l < letters.length; l++) {
+                        const letter = letters[l];
+                        
+                        for (let n = start; n <= end; n++) {
+                            const newName = `${prefix}_${letter}_${n}`;
+                            renamedFiles.push(newName);
+                            photoIndex++;
+                        }
+                    }
+                }
+                
+                // Auto-adjust end value based on group size
+                if (multipleEndInput.value != groupSize) {
+                    multipleEndInput.value = groupSize;
+                    end = groupSize;
+                }
+            }
+            
+            function generateCustomNames() {
+                const customNames = customNamesInput.value.trim().split('\n').map(name => name.trim()).filter(name => name !== '');
+                
+                if (customNames.length === 0) {
+                    // If no custom names, use default names
+                    for (let i = 0; i < selectedFiles.length; i++) {
+                        renamedFiles.push(`photo_${i + 1}`);
+                    }
+                    return;
+                }
+                
+                // Special handling for custom names: duplicate first file for all names
+                renamedFiles = customNames;
+            }
+            
+            function generateNumberSequence() {
+                const start = parseInt(startNumberInput.value) || 1;
+                const step = parseInt(stepValueInput.value) || 1;
+                
+                for (let i = 0; i < selectedFiles.length; i++) {
+                    // Simple number sequence without any prefixes or suffixes
+                    const numberValue = start + (i * step);
+                    renamedFiles.push(numberValue.toString());
+                }
+            }
+            
+            function updateStatus() {
+                let message = '';
+                
+                if (selectedFiles.length === 0) {
+                    message = 'Ready to rename photos. Select files and options.';
+                    downloadBtn.disabled = true;
+                } else {
+                    const fileWord = selectedFiles.length === 1 ? 'file' : 'files';
+                    
+                    if (currentTab === 'custom' && customNamesInput.value.trim() !== '') {
+                        // Custom tab with names - show special message
+                        message = `Selected ${selectedFiles.length} ${fileWord}. Will create ${renamedFiles.length} files.`;
+                        downloadBtn.disabled = false;
+                    } else if (currentTab === 'multiple') {
+                        const prefixes = getMultiplePrefixes();
+                        const letters = multipleLettersInput.value.split(',').map(l => l.trim()).filter(l => l !== '');
+                        const groupSize = selectedFiles.length;
+                        const start = parseInt(multipleStartInput.value) || 1;
+                        const end = parseInt(multipleEndInput.value) || start;
+                        
+                        if (prefixes.length > 0 && letters.length > 0) {
+                            const totalPerPrefix = letters.length * (end - start + 1);
+                            const totalNeeded = prefixes.length * totalPerPrefix;
+                            const duplicationFactor = Math.ceil(totalNeeded / selectedFiles.length);
+                            
+                            message = `Selected ${selectedFiles.length} photos → ${renamedFiles.length} files (${duplicationFactor}x). `;
+                            message += `Pattern: ${prefixes.length} prefixes × ${letters.length} letters × ${end-start+1} numbers`;
+                            message += ` (Auto group size: ${groupSize})`;
+                            
+                            downloadBtn.disabled = false;
+                        } else {
+                            message = `Selected ${selectedFiles.length} ${fileWord}. Add at least one prefix and letters.`;
+                            downloadBtn.disabled = true;
+                        }
+                    } else {
+                        message = `Selected ${selectedFiles.length} ${fileWord}. `;
+                        
+                        if (renamedFiles.length >= selectedFiles.length) {
+                            message += `Generated ${renamedFiles.length} names.`;
+                            downloadBtn.disabled = false;
+                        } else {
+                            message += `Warning: Only ${renamedFiles.length} names generated.`;
+                            downloadBtn.disabled = true;
+                        }
+                    }
+                }
+                
+                statusBar.textContent = message;
+            }
+            
+            function renameFiles() {
+                if (selectedFiles.length === 0) {
+                    statusBar.textContent = 'Please select files to rename.';
+                    return;
+                }
+                
+                if (currentTab !== 'custom' && renamedFiles.length < selectedFiles.length) {
+                    statusBar.textContent = 'Error: Not enough names generated.';
+                    return;
+                }
+                
+                // Simulate renaming process
+                statusBar.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Renaming ${selectedFiles.length} files...`;
+                
+                setTimeout(() => {
+                    statusBar.innerHTML = `Success! <i class="fas fa-check-circle"></i>`;
+                    downloadBtn.disabled = false;
+                }, 500);
+            }
+            
+            function downloadFiles() {
+                if (renamedFiles.length === 0 || selectedFiles.length === 0) {
+                    statusBar.textContent = 'No files to download.';
+                    return;
+                }
+                
+                if (currentTab !== 'custom' && renamedFiles.length < selectedFiles.length) {
+                    statusBar.textContent = 'Error: Not enough names generated.';
+                    return;
+                }
+                
+                statusBar.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Preparing ${renamedFiles.length} files...`;
+                progressContainer.classList.remove('hidden');
+                progressBar.style.width = '0%';
+                
+                // Create a temporary container for download links
+                const tempContainer = document.createElement('div');
+                tempContainer.style.display = 'none';
+                document.body.appendChild(tempContainer);
+                
+                // Initialize download counter
+                let downloadedCount = 0;
+                const totalFiles = renamedFiles.length;
+                
+                // Function to trigger download for a file
+                function downloadFile(file, name) {
+                    return new Promise((resolve) => {
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(file);
+                        link.download = name;
+                        link.textContent = 'Download ' + name;
+                        tempContainer.appendChild(link);
+                        
+                        // Use setTimeout to trigger the download
+                        setTimeout(() => {
+                            link.click();
+                            
+                            // Clean up
+                            setTimeout(() => {
+                                URL.revokeObjectURL(link.href);
+                                tempContainer.removeChild(link);
+                                resolve();
+                            }, 100);
+                        }, 100);
+                    });
+                }
+                
+                // Function to process downloads sequentially
+                async function processDownloads() {
+                    // Handle custom tab duplication
+                    if (currentTab === 'custom' && customNamesInput.value.trim() !== '') {
+                        // Use the first file for all custom names
+                        const file = selectedFiles[0];
+                        
+                        for (let i = 0; i < renamedFiles.length; i++) {
+                            const name = renamedFiles[i] + getFileExtension(file.name);
+                            await downloadFile(file, name);
+                            
+                            // Update progress
+                            downloadedCount++;
+                            progressBar.style.width = `${(downloadedCount / totalFiles) * 100}%`;
+                        }
+                    } else if (currentTab === 'multiple') {
+                        // For multiple tab: Cycle through uploaded photos
+                        for (let i = 0; i < renamedFiles.length; i++) {
+                            // Cycle through available photos
+                            const fileIndex = i % selectedFiles.length;
+                            const file = selectedFiles[fileIndex];
+                            const name = renamedFiles[i] + getFileExtension(file.name);
+                            
+                            await downloadFile(file, name);
+                            
+                            // Update progress
+                            downloadedCount++;
+                            progressBar.style.width = `${(downloadedCount / totalFiles) * 100}%`;
+                        }
+                    } else {
+                        // Normal download - one file per name
+                        for (let i = 0; i < selectedFiles.length; i++) {
+                            if (i < renamedFiles.length) {
+                                const file = selectedFiles[i];
+                                let name = renamedFiles[i];
+                                
+                                // For numbers tab, we need to add the extension
+                                if (currentTab === 'numbers') {
+                                    name += getFileExtension(file.name);
+                                } else {
+                                    name += getFileExtension(file.name);
+                                }
+                                
+                                await downloadFile(file, name);
+                                
+                                // Update progress
+                                downloadedCount++;
+                                progressBar.style.width = `${(downloadedCount / totalFiles) * 100}%`;
+                            }
+                        }
+                    }
+                    
+                    // Remove the temporary container
+                    setTimeout(() => {
+                        document.body.removeChild(tempContainer);
+                        statusBar.innerHTML = `Download complete! <i class="fas fa-check-circle"></i>`;
+                        
+                        // Hide progress bar after delay
+                        setTimeout(() => {
+                            progressContainer.classList.add('hidden');
+                        }, 2000);
+                    }, 500);
+                }
+                
+                // Start processing downloads
+                processDownloads();
+            }
+            
+            function getFileExtension(filename) {
+                return filename.slice(filename.lastIndexOf('.'));
+            }
+            
+            function resetTool() {
+                selectedFiles = [];
+                renamedFiles = [];
+                fileInput.value = '';
+                updateFileCount();
+                updateAutoGroupSize();
+                generateNames();
+                updateStatus();
+                downloadBtn.disabled = true;
+                progressContainer.classList.add('hidden');
+                
+                // Reset form inputs
+                prefixInput.value = 'S1';
+                startRangeInput.value = '1';
+                endRangeInput.value = '10';
+                patternPrefixInput.value = 'S5';
+                lettersInput.value = 'a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z';
+                patternStartInput.value = '1';
+                patternEndInput.value = '2';
+                pairSizeInput.value = '2';
+                customNamesInput.value = '';
+                startNumberInput.value = '1';
+                stepValueInput.value = '1';
+                
+                // Reset multiple tab inputs
+                multipleStartInput.value = '1';
+                multipleEndInput.value = '1';
+                multipleLettersInput.value = 'a,b,c';
+                
+                // Reset multiple prefixes
+                const prefixRows = prefixInputs.querySelectorAll('.prefix-input-row');
+                prefixRows.forEach((row, index) => {
+                    if (index > 1) { // Keep only first two
+                        prefixInputs.removeChild(row);
+                    }
+                });
+                
+                // Reset first prefix input
+                const firstInput = prefixInputs.querySelector('.multiple-prefix');
+                if (firstInput) {
+                    firstInput.value = 'S5';
+                }
+                
+                // Reset second input
+                const secondInput = prefixInputs.querySelectorAll('.multiple-prefix')[1];
+                if (secondInput) {
+                    secondInput.value = 'S15';
+                }
+                
+                // Reset tabs (only range tab in demo mode)
+                tabs.forEach(t => t.classList.remove('active'));
+                tabs[0].classList.add('active');
+                rangeTab.classList.add('active');
+                patternTab.classList.remove('active');
+                multipleTab.classList.remove('active');
+                customTab.classList.remove('active');
+                numbersTab.classList.remove('active');
+                licenseTab.classList.remove('active');
+                currentTab = 'range';
+                
+                statusBar.textContent = 'Ready to rename photos. Select files and options.';
+            }
+        });
+    </script>
+</body>
+</html>
